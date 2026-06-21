@@ -1,12 +1,7 @@
-/**
- * dashboard.js — Loads and renders the logged-in student's profile info.
- */
-
 document.addEventListener("DOMContentLoaded", async () => {
   const contentEl = document.getElementById("profile-content");
   const skeletonEl = document.getElementById("profile-skeleton");
 
-  /* ── Helpers ──────────────────────────────────────────────────── */
   function formatDate(iso) {
     if (!iso) return "—";
     try {
@@ -44,7 +39,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       .join("");
   }
 
-  /* ── Render user data ─────────────────────────────────────────── */
+  // Render user data
   function render(user) {
     // Topbar user info
     const nameEl = document.querySelector(".topbar__user-name");
@@ -87,7 +82,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-  /* ── Fetch ────────────────────────────────────────────────────── */
+  // fetch dashboard date
   try {
     const { ok, data } = await API.get("/dashboard");
     if (ok && data?.success) {

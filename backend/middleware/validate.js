@@ -97,7 +97,7 @@ const confirmPasswordRules = body("confirmPassword")
     return true;
   });
 
-// ─── Validation chains ──────────────────────────────────────────────────────
+// Validation chains
 
 const registerValidation = [
   fullNameRules,
@@ -165,7 +165,7 @@ const passwordChangeValidation = [
     }),
 ];
 
-// ─── Result handler ─────────────────────────────────────────────────────────
+// Result handler
 
 /**
  * Middleware that reads express-validator results and returns 422 with

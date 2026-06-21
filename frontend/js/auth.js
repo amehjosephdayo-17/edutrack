@@ -1,18 +1,4 @@
-/**
- * auth.js — Login, Register, and Remember-me client-side logic.
- *
- * Handles:
- *  - Login form (#login-form) on index.html
- *  - Register form (#register-form) on register.html
- *  - Inline field validation with error messages
- *  - Calling the backend via the API wrapper
- */
-
 document.addEventListener("DOMContentLoaded", () => {
-  /* ════════════════════════════════════════════════════════════════
-     Utility helpers
-  ════════════════════════════════════════════════════════════════ */
-
   /** Show a field-level error message. */
   function setFieldError(fieldId, message) {
     const field = document.getElementById(fieldId);
@@ -40,9 +26,8 @@ document.addEventListener("DOMContentLoaded", () => {
     return el ? el.value.trim() : "";
   }
 
-  /* ════════════════════════════════════════════════════════════════
-     Password show/hide toggles
-  ════════════════════════════════════════════════════════════════ */
+  //  Password show/hide toggles
+
   document.querySelectorAll(".input-wrapper__toggle").forEach((btn) => {
     btn.addEventListener("click", () => {
       const wrapper = btn.closest(".input-wrapper");
@@ -62,9 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  /* ════════════════════════════════════════════════════════════════
-     LOGIN
-  ════════════════════════════════════════════════════════════════ */
+  // login
   const loginForm = document.getElementById("login-form");
   if (loginForm) {
     const alertEl = document.getElementById("login-alert");
@@ -123,9 +106,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  /* ════════════════════════════════════════════════════════════════
-     REGISTER — Client-side validation rules
-  ════════════════════════════════════════════════════════════════ */
+  //  REGISTER — Client-side validation rules
   const registerForm = document.getElementById("register-form");
   if (registerForm) {
     const alertEl = document.getElementById("register-alert");

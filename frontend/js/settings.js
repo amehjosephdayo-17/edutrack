@@ -1,9 +1,4 @@
-/**
- * settings.js — Profile update + password change logic.
- */
-
 document.addEventListener("DOMContentLoaded", async () => {
-  /* ── Utilities ────────────────────────────────────────────────── */
   function setFieldError(id, msg) {
     const el = document.getElementById(id);
     const errEl = document.getElementById(id + "-error");
@@ -36,7 +31,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       .join("");
   }
 
-  /* ── Load current profile ─────────────────────────────────────── */
+  // Load current profile
   async function loadProfile() {
     const { ok, data } = await API.get("/settings/profile");
     if (!ok || !data?.success) return;
@@ -74,7 +69,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   await loadProfile();
 
-  /* ── Profile update form ──────────────────────────────────────── */
+  // Profile update form
   const profileForm = document.getElementById("profile-form");
   const profileAlert = document.getElementById("profile-alert");
   const PROFILE_FIELDS = [
@@ -162,7 +157,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-  /* ── Password change form ─────────────────────────────────────── */
+  // Password change form
   const passwordForm = document.getElementById("password-form");
   const passwordAlert = document.getElementById("password-alert");
   const PWD_FIELDS = ["currentPassword", "password", "confirmPassword"];
@@ -242,7 +237,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-  /* ── Password show/hide toggles ─────────────────────────────────── */
+  // Password show/hide toggles
   document.querySelectorAll(".input-wrapper__toggle").forEach((btn) => {
     btn.addEventListener("click", () => {
       const wrapper = btn.closest(".input-wrapper");

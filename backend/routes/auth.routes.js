@@ -10,6 +10,9 @@ const {
 
 const router = express.Router();
 
+// looked-up user does not exist, preventing user-enumeration via response time.
+const DUMMY_HASH = bcrypt.hashSync("timing-safe-dummy-password", 12);
+
 // auth/register
 router.post(
   "/register",
@@ -94,9 +97,7 @@ router.post(
       const user = await User.findOne({ email: email.toLowerCase() });
 
       // Always run bcrypt compare to prevent timing attacks
-      const dummyHash =
-        "$2a$12$invalidhashplaceholderfortiming00000000000000000000000";
-      const hashToCompare = user ? user.passwordHash : dummyHash;
+      const hashToCompare = user ? user.passwordHash : DUMMY_HASH;
       const isMatch = await bcrypt.compare(password, hashToCompare);
 
       if (!user || !isMatch) {

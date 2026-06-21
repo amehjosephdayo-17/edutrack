@@ -1,18 +1,3 @@
-/**
- * sidebar.js — Sidebar collapse/expand and mobile overlay logic.
- * Also handles the user-dropdown in the topbar and logout.
- *
- * Expected DOM:
- *   .sidebar           — the sidebar element
- *   .main-area         — the main content wrapper
- *   .sidebar__collapse-btn  — desktop collapse toggle inside sidebar header
- *   .topbar__toggle         — mobile hamburger button in topbar
- *   #sidebar-overlay        — semi-transparent overlay for mobile (optional)
- *   .topbar__user           — clickable user area
- *   #user-dropdown          — dropdown menu
- *   [data-logout]           — logout button/link
- */
-
 document.addEventListener("DOMContentLoaded", () => {
   const sidebar = document.querySelector(".sidebar");
   const mainArea = document.querySelector(".main-area");
@@ -23,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const dropdown = document.getElementById("user-dropdown");
   const logoutBtn = document.querySelector("[data-logout]");
 
-  /* ── Collapse / expand (desktop) ──────────────────────────────── */
+  // Collapse / expand (desktop)
   function toggleCollapse() {
     const isCollapsed = sidebar.classList.toggle("collapsed");
     mainArea && mainArea.classList.toggle("sidebar-collapsed", isCollapsed);
@@ -39,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   collapseBtn && collapseBtn.addEventListener("click", toggleCollapse);
 
-  /* ── Mobile open / close ─────────────────────────────────────── */
+  // Mobile open / close
   function openMobileSidebar() {
     sidebar && sidebar.classList.add("open");
     overlay && overlay.classList.add("visible");
@@ -58,7 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
     link.addEventListener("click", closeMobileSidebar);
   });
 
-  /* ── User dropdown ───────────────────────────────────────────── */
+  // User dropdown
   if (userMenu && dropdown) {
     userMenu.addEventListener("click", (e) => {
       e.stopPropagation();
@@ -72,7 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  /* ── Logout ──────────────────────────────────────────────────── */
+  // Logout
   if (logoutBtn) {
     logoutBtn.addEventListener("click", async (e) => {
       e.preventDefault();

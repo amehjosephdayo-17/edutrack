@@ -13,7 +13,7 @@ const router = express.Router();
 // All settings routes require auth
 router.use(requireAuth);
 
-// ─── GET /settings/profile ───────────────────────────────────────────────────
+// /settings/profile
 router.get("/profile", async (req, res) => {
   try {
     const user = await User.findById(req.session.userId).select(
@@ -31,7 +31,7 @@ router.get("/profile", async (req, res) => {
   }
 });
 
-// ─── PATCH /settings/profile ─────────────────────────────────────────────────
+// /settings/profile
 router.patch(
   "/profile",
   profileUpdateValidation,
@@ -63,7 +63,6 @@ router.patch(
           level,
           dateOfBirth: new Date(dateOfBirth),
           gender: gender || "",
-          // matricNumber is intentionally excluded — read-only after registration
         },
         { new: true, runValidators: true },
       ).select("-passwordHash");
@@ -86,7 +85,7 @@ router.patch(
   },
 );
 
-// ─── POST /settings/password ─────────────────────────────────────────────────
+// /settings/password
 router.post(
   "/password",
   passwordChangeValidation,

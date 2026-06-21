@@ -4,7 +4,7 @@ const { requireAuth } = require("../middleware/auth.middleware");
 
 const router = express.Router();
 
-// ─── GET /dashboard ──────────────────────────────────────────────────────────
+// /dashboard
 router.get("/", requireAuth, async (req, res) => {
   try {
     const user = await User.findById(req.session.userId).select(

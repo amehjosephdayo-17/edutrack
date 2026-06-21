@@ -1,9 +1,3 @@
-/**
- * api.js — Thin fetch wrapper for EduTrack backend calls.
- *
- * All requests send/receive JSON. On a 401 the user is redirected to login.
- */
-
 const API = (() => {
   /**
    * Core fetch helper.
