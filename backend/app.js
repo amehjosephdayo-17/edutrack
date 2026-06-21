@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const path = require("path");
 const session = require("express-session");
+const MongoStore = require("connect-mongo");
 const connectDB = require("./config/db");
 
 // routes
@@ -23,6 +24,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(
   session({
     secret: process.env.SESSION_SECRET || "change_this_secret",
+    store: MongoStore.create({ mongoUrl: process.env.MONGODB_URI }),
     resave: false,
     saveUninitialized: false,
     cookie: {
@@ -50,6 +52,11 @@ app.get("*", (req, res) => {
 
 //  Start server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`EduTrack server running on http://localhost:${PORT}`);
-});
+
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`EduTrack server running on http://localhost:${PORT}`);
+  });
+}
+
+module.exports = app;
