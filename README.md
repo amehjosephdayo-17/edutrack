@@ -232,7 +232,3 @@ npm start      # Start with node (production)
 - Rate limiting is active on login and register endpoints out of the box
 
 ---
-
-## License
-
-MIT

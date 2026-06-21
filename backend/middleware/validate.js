@@ -1,13 +1,12 @@
 const { body, validationResult } = require("express-validator");
 
 // Allowed level values
-const ALLOWED_LEVELS = ["100L", "200L", "300L", "400L", "500L", "600L"];
+const ALLOWED_LEVELS = ["ND 1", "ND 2", "HND 1", "HND 2"];
 
-// Matric number pattern — alphanumeric with optional slashes/dashes
-// e.g. CSC/2020/001, 2020/12345, ENG-2021-002
-const MATRIC_PATTERN = /^[A-Za-z0-9\-\/]{4,20}$/;
+// Matric number pattern — 10-digit numeric format e.g. 2460113247
+const MATRIC_PATTERN = /^[0-9]{10}$/;
 
-// ─── Reusable field rules ───────────────────────────────────────────────────
+// Reusable field rules
 
 const fullNameRules = body("fullName")
   .trim()
@@ -39,10 +38,8 @@ const matricRules = body("matricNumber")
   .trim()
   .notEmpty()
   .withMessage("Matric/Student ID is required.")
-  .matches(MATRIC_PATTERN)
-  .withMessage(
-    "Matric number must be 4–20 alphanumeric characters (slashes/dashes allowed).",
-  );
+  .matches(/^[0-9]{10}$/)
+  .withMessage("Matric number must be a 10-digit number (e.g. 2460113247).");
 
 const departmentRules = body("department")
   .trim()

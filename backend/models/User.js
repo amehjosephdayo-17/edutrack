@@ -32,7 +32,7 @@ const userSchema = new mongoose.Schema({
   level: {
     type: String,
     required: true,
-    enum: ["100L", "200L", "300L", "400L", "500L", "600L"],
+    enum: ["ND 1", "ND 2", "HND 1", "HND 2"],
   },
   dateOfBirth: {
     type: Date,

@@ -146,9 +146,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const matric = val("matricNumber");
       if (!matric) errors.matricNumber = "Matric/Student ID is required.";
-      else if (!/^[A-Za-z0-9\-\/]{4,20}$/.test(matric))
+      else if (!/^[0-9]{10}$/.test(matric))
         errors.matricNumber =
-          "Matric number must be 4–20 alphanumeric characters.";
+          "Matric number must be a 10-digit number (e.g. 2461113257).";
 
       const dept = val("department");
       if (!dept) errors.department = "Department is required.";
