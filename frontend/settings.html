@@ -1,0 +1,747 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Settings — EduTrack</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/variables.css" />
+    <link rel="stylesheet" href="/css/base.css" />
+    <link rel="stylesheet" href="/css/layout.css" />
+    <link rel="stylesheet" href="/css/components.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <!-- ── Sidebar ───────────────────────────────────────────── -->
+      <aside class="sidebar" aria-label="Main navigation">
+        <div class="sidebar__header">
+          <a
+            href="/dashboard.html"
+            class="sidebar__logo"
+            aria-label="EduTrack home"
+          >
+            <img src="/assets/logo.svg" alt="" width="120" height="30" />
+          </a>
+          <button
+            class="sidebar__collapse-btn"
+            aria-label="Collapse sidebar"
+            title="Collapse sidebar"
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <line x1="3" y1="12" x2="21" y2="12" />
+              <line x1="3" y1="18" x2="21" y2="18" />
+            </svg>
+          </button>
+        </div>
+
+        <nav class="sidebar__nav" aria-label="Portal navigation">
+          <!-- Dashboard -->
+          <a href="/dashboard.html" class="nav-item">
+            <svg
+              class="nav-item__icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <rect x="3" y="3" width="7" height="7" rx="1" />
+              <rect x="14" y="3" width="7" height="7" rx="1" />
+              <rect x="3" y="14" width="7" height="7" rx="1" />
+              <rect x="14" y="14" width="7" height="7" rx="1" />
+            </svg>
+            Dashboard
+          </a>
+
+          <!-- Settings (active) -->
+          <a href="/settings.html" class="nav-item active" aria-current="page">
+            <svg
+              class="nav-item__icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <circle cx="12" cy="12" r="3" />
+              <path
+                d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1
+                0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0
+                0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4
+                0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0
+                0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65
+                1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0
+                1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0
+                0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65
+                1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1
+                4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0
+                1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65
+                1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0
+                1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"
+              />
+            </svg>
+            Settings
+          </a>
+        </nav>
+
+        <div class="sidebar__footer">
+          <button class="nav-item" data-logout aria-label="Sign out">
+            <svg
+              class="nav-item__icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+            Sign Out
+          </button>
+        </div>
+      </aside>
+
+      <!-- Mobile overlay -->
+      <div
+        id="sidebar-overlay"
+        class="sidebar-overlay"
+        aria-hidden="true"
+      ></div>
+
+      <!-- ── Main area ─────────────────────────────────────────── -->
+      <div class="main-area">
+        <!-- Top bar -->
+        <header class="topbar" role="banner">
+          <div class="topbar__left">
+            <button class="topbar__toggle" aria-label="Open navigation menu">
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <line x1="3" y1="12" x2="21" y2="12" />
+                <line x1="3" y1="18" x2="21" y2="18" />
+              </svg>
+            </button>
+            <span class="topbar__page-title">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <circle cx="12" cy="12" r="3" />
+                <path
+                  d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0
+                  2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33
+                  1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0
+                  0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0
+                  1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0
+                  0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65
+                  1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65
+                  1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4
+                  0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0
+                  1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0
+                  0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65
+                  1.65 0 0 0-1.51 1z"
+                />
+              </svg>
+              Settings
+            </span>
+          </div>
+
+          <div class="topbar__right">
+            <button class="topbar__bell" aria-label="Notifications">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+              </svg>
+            </button>
+
+            <div
+              class="topbar__user"
+              role="button"
+              aria-haspopup="true"
+              aria-expanded="false"
+              aria-controls="user-dropdown"
+              tabindex="0"
+            >
+              <div class="topbar__avatar" aria-hidden="true">??</div>
+              <div class="topbar__user-info">
+                <span class="topbar__user-name">Loading…</span>
+                <span class="topbar__user-email">—</span>
+              </div>
+              <svg
+                class="topbar__chevron"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            </div>
+
+            <div id="user-dropdown" class="user-dropdown" role="menu">
+              <a
+                href="/settings.html"
+                class="user-dropdown__item"
+                role="menuitem"
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <circle cx="12" cy="8" r="4" />
+                  <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+                </svg>
+                Settings
+              </a>
+              <hr class="user-dropdown__divider" />
+              <button
+                class="user-dropdown__item user-dropdown__item--danger"
+                role="menuitem"
+                data-logout
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                  <polyline points="16 17 21 12 16 7" />
+                  <line x1="21" y1="12" x2="9" y2="12" />
+                </svg>
+                Sign Out
+              </button>
+            </div>
+          </div>
+        </header>
+
+        <!-- Page content -->
+        <main class="page-content" id="main-content">
+          <div class="page-header">
+            <p class="page-header__subtitle">Manage your account details</p>
+          </div>
+
+          <!-- ── Section 1: Update Profile ──────────────────────── -->
+          <div class="card" style="margin-bottom: 1.75rem">
+            <div class="card__header">
+              <div>
+                <h2 class="card__title">Profile Information</h2>
+                <p class="card__subtitle">
+                  Update your personal and academic details. Matric number
+                  cannot be changed.
+                </p>
+              </div>
+            </div>
+
+            <div
+              id="profile-alert"
+              class="alert hidden"
+              role="alert"
+              aria-live="polite"
+            ></div>
+
+            <form id="profile-form" novalidate>
+              <!-- Personal Information -->
+              <p class="section-title" style="margin-bottom: 0.75rem">
+                Personal Information
+              </p>
+              <div class="form-grid">
+                <!-- Full Name -->
+                <div class="form-group form-group--full">
+                  <label class="form-label" for="fullName">
+                    Full Name <span class="required" aria-hidden="true">*</span>
+                  </label>
+                  <input
+                    class="form-input"
+                    type="text"
+                    id="fullName"
+                    name="fullName"
+                    autocomplete="name"
+                    required
+                  />
+                  <span
+                    class="form-error"
+                    id="fullName-error"
+                    aria-live="polite"
+                  ></span>
+                </div>
+
+                <!-- Email -->
+                <div class="form-group">
+                  <label class="form-label" for="email">
+                    Email Address
+                    <span class="required" aria-hidden="true">*</span>
+                  </label>
+                  <input
+                    class="form-input"
+                    type="email"
+                    id="email"
+                    name="email"
+                    autocomplete="email"
+                    required
+                  />
+                  <span
+                    class="form-error"
+                    id="email-error"
+                    aria-live="polite"
+                  ></span>
+                </div>
+
+                <!-- Phone -->
+                <div class="form-group">
+                  <label class="form-label" for="phone">
+                    Phone Number
+                    <span class="required" aria-hidden="true">*</span>
+                  </label>
+                  <input
+                    class="form-input"
+                    type="tel"
+                    id="phone"
+                    name="phone"
+                    autocomplete="tel"
+                    required
+                  />
+                  <span
+                    class="form-error"
+                    id="phone-error"
+                    aria-live="polite"
+                  ></span>
+                </div>
+
+                <!-- Date of Birth -->
+                <div class="form-group">
+                  <label class="form-label" for="dateOfBirth">
+                    Date of Birth
+                    <span class="required" aria-hidden="true">*</span>
+                  </label>
+                  <input
+                    class="form-input"
+                    type="date"
+                    id="dateOfBirth"
+                    name="dateOfBirth"
+                    required
+                  />
+                  <span
+                    class="form-error"
+                    id="dateOfBirth-error"
+                    aria-live="polite"
+                  ></span>
+                </div>
+
+                <!-- Gender -->
+                <div class="form-group">
+                  <label class="form-label" for="gender">Gender</label>
+                  <select class="form-select" id="gender" name="gender">
+                    <option value="">Prefer not to say</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Prefer not to say">Prefer not to say</option>
+                  </select>
+                  <span
+                    class="form-error"
+                    id="gender-error"
+                    aria-live="polite"
+                  ></span>
+                </div>
+              </div>
+
+              <hr class="divider" />
+
+              <!-- Academic Information -->
+              <p class="section-title" style="margin-bottom: 0.75rem">
+                Academic Information
+              </p>
+              <div class="form-grid">
+                <!-- Matric Number (read-only) -->
+                <div class="form-group">
+                  <label class="form-label" for="matricNumber">
+                    Matric / Student ID
+                    <span class="form-hint" style="font-weight: 400"
+                      >(read-only)</span
+                    >
+                  </label>
+                  <input
+                    class="form-input"
+                    type="text"
+                    id="matricNumber"
+                    name="matricNumber"
+                    readonly
+                    aria-readonly="true"
+                  />
+                  <span class="form-hint"
+                    >Cannot be changed after registration.</span
+                  >
+                </div>
+
+                <!-- Department -->
+                <div class="form-group">
+                  <label class="form-label" for="department">
+                    Department / Course
+                    <span class="required" aria-hidden="true">*</span>
+                  </label>
+                  <input
+                    class="form-input"
+                    type="text"
+                    id="department"
+                    name="department"
+                    required
+                  />
+                  <span
+                    class="form-error"
+                    id="department-error"
+                    aria-live="polite"
+                  ></span>
+                </div>
+
+                <!-- Level -->
+                <div class="form-group">
+                  <label class="form-label" for="level">
+                    Level / Year of Study
+                    <span class="required" aria-hidden="true">*</span>
+                  </label>
+                  <select class="form-select" id="level" name="level" required>
+                    <option value="">Select level</option>
+                    <option value="100L">100 Level</option>
+                    <option value="200L">200 Level</option>
+                    <option value="300L">300 Level</option>
+                    <option value="400L">400 Level</option>
+                    <option value="500L">500 Level</option>
+                    <option value="600L">600 Level</option>
+                  </select>
+                  <span
+                    class="form-error"
+                    id="level-error"
+                    aria-live="polite"
+                  ></span>
+                </div>
+              </div>
+
+              <div
+                style="
+                  display: flex;
+                  justify-content: flex-end;
+                  margin-top: 0.5rem;
+                "
+              >
+                <button type="submit" class="btn btn--primary">
+                  Save Changes
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- ── Section 2: Change Password ────────────────────── -->
+          <div class="card">
+            <div class="card__header">
+              <div>
+                <h2 class="card__title">Change Password</h2>
+                <p class="card__subtitle">
+                  You'll be signed out and redirected to login after a
+                  successful password change.
+                </p>
+              </div>
+            </div>
+
+            <div
+              id="password-alert"
+              class="alert hidden"
+              role="alert"
+              aria-live="polite"
+            ></div>
+
+            <form id="password-form" novalidate>
+              <div class="form-grid">
+                <!-- Current Password -->
+                <div class="form-group form-group--full">
+                  <label class="form-label" for="currentPassword">
+                    Current Password
+                    <span class="required" aria-hidden="true">*</span>
+                  </label>
+                  <div class="input-wrapper">
+                    <input
+                      class="form-input"
+                      type="password"
+                      id="currentPassword"
+                      name="currentPassword"
+                      autocomplete="current-password"
+                      required
+                    />
+                    <button
+                      type="button"
+                      class="input-wrapper__toggle"
+                      aria-label="Show password"
+                    >
+                      <svg
+                        class="icon-eye"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                      >
+                        <path
+                          d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
+                        />
+                        <circle cx="12" cy="12" r="3" />
+                      </svg>
+                      <svg
+                        class="icon-eye-off"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                        style="display: none"
+                      >
+                        <path
+                          d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45
+                          18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11
+                          8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"
+                        />
+                        <line x1="1" y1="1" x2="23" y2="23" />
+                      </svg>
+                    </button>
+                  </div>
+                  <span
+                    class="form-error"
+                    id="currentPassword-error"
+                    aria-live="polite"
+                  ></span>
+                </div>
+
+                <!-- New Password -->
+                <div class="form-group">
+                  <label class="form-label" for="password">
+                    New Password
+                    <span class="required" aria-hidden="true">*</span>
+                  </label>
+                  <div class="input-wrapper">
+                    <input
+                      class="form-input"
+                      type="password"
+                      id="password"
+                      name="password"
+                      autocomplete="new-password"
+                      placeholder="Min 8 chars, upper, lower, number"
+                      required
+                    />
+                    <button
+                      type="button"
+                      class="input-wrapper__toggle"
+                      aria-label="Show password"
+                    >
+                      <svg
+                        class="icon-eye"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                      >
+                        <path
+                          d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
+                        />
+                        <circle cx="12" cy="12" r="3" />
+                      </svg>
+                      <svg
+                        class="icon-eye-off"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                        style="display: none"
+                      >
+                        <path
+                          d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45
+                          18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11
+                          8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"
+                        />
+                        <line x1="1" y1="1" x2="23" y2="23" />
+                      </svg>
+                    </button>
+                  </div>
+                  <span
+                    class="form-error"
+                    id="password-error"
+                    aria-live="polite"
+                  ></span>
+                </div>
+
+                <!-- Confirm New Password -->
+                <div class="form-group">
+                  <label class="form-label" for="confirmPassword">
+                    Confirm New Password
+                    <span class="required" aria-hidden="true">*</span>
+                  </label>
+                  <div class="input-wrapper">
+                    <input
+                      class="form-input"
+                      type="password"
+                      id="confirmPassword"
+                      name="confirmPassword"
+                      autocomplete="new-password"
+                      placeholder="Repeat new password"
+                      required
+                    />
+                    <button
+                      type="button"
+                      class="input-wrapper__toggle"
+                      aria-label="Show password"
+                    >
+                      <svg
+                        class="icon-eye"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                      >
+                        <path
+                          d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
+                        />
+                        <circle cx="12" cy="12" r="3" />
+                      </svg>
+                      <svg
+                        class="icon-eye-off"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                        style="display: none"
+                      >
+                        <path
+                          d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45
+                          18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11
+                          8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"
+                        />
+                        <line x1="1" y1="1" x2="23" y2="23" />
+                      </svg>
+                    </button>
+                  </div>
+                  <span
+                    class="form-error"
+                    id="confirmPassword-error"
+                    aria-live="polite"
+                  ></span>
+                </div>
+              </div>
+
+              <div
+                style="
+                  display: flex;
+                  justify-content: flex-end;
+                  margin-top: 0.5rem;
+                "
+              >
+                <button type="submit" class="btn btn--danger">
+                  Change Password
+                </button>
+              </div>
+            </form>
+          </div>
+        </main>
+      </div>
+      <!-- /.main-area -->
+    </div>
+    <!-- /.app-shell -->
+
+    <script src="/js/api.js"></script>
+    <script src="/js/settings.js"></script>
+    <script src="/js/sidebar.js"></script>
+  </body>
+</html>

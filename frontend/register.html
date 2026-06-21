@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register — EduTrack</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/variables.css" />
+    <link rel="stylesheet" href="/css/base.css" />
+    <link rel="stylesheet" href="/css/components.css" />
+  </head>
+  <body class="auth-page">
+    <main class="auth-card auth-card--wide" role="main">
+      <div class="auth-logo" aria-label="EduTrack">
+        <img src="/assets/logo.svg" alt="" width="140" height="35" />
+      </div>
+
+      <h1 class="auth-title">Create your account</h1>
+      <p class="auth-subtitle">Fill in your student details to get started</p>
+
+      <div
+        id="register-alert"
+        class="alert alert--error hidden"
+        role="alert"
+        aria-live="polite"
+      ></div>
+
+      <form id="register-form" novalidate>
+        <!-- ── Section 1: Personal Information ────────────── -->
+        <fieldset style="border: none; padding: 0; margin: 0 0 0.5rem">
+          <legend class="section-title" style="margin-bottom: 0.75rem">
+            Personal Information
+          </legend>
+          <div class="form-grid">
+            <!-- Full Name -->
+            <div class="form-group form-group--full">
+              <label class="form-label" for="fullName"
+                >Full Name
+                <span class="required" aria-hidden="true">*</span></label
+              >
+              <input
+                class="form-input"
+                type="text"
+                id="fullName"
+                name="fullName"
+                placeholder="e.g. Amaka Johnson"
+                autocomplete="name"
+                required
+              />
+              <span
+                class="form-error"
+                id="fullName-error"
+                aria-live="polite"
+              ></span>
+            </div>
+
+            <!-- Email -->
+            <div class="form-group">
+              <label class="form-label" for="email"
+                >Email Address
+                <span class="required" aria-hidden="true">*</span></label
+              >
+              <input
+                class="form-input"
+                type="email"
+                id="email"
+                name="email"
+                placeholder="you@university.edu"
+                autocomplete="email"
+                required
+              />
+              <span
+                class="form-error"
+                id="email-error"
+                aria-live="polite"
+              ></span>
+            </div>
+
+            <!-- Phone -->
+            <div class="form-group">
+              <label class="form-label" for="phone"
+                >Phone Number
+                <span class="required" aria-hidden="true">*</span></label
+              >
+              <input
+                class="form-input"
+                type="tel"
+                id="phone"
+                name="phone"
+                placeholder="+2348012345678"
+                autocomplete="tel"
+                required
+              />
+              <span
+                class="form-error"
+                id="phone-error"
+                aria-live="polite"
+              ></span>
+            </div>
+
+            <!-- Date of Birth -->
+            <div class="form-group">
+              <label class="form-label" for="dateOfBirth"
+                >Date of Birth
+                <span class="required" aria-hidden="true">*</span></label
+              >
+              <input
+                class="form-input"
+                type="date"
+                id="dateOfBirth"
+                name="dateOfBirth"
+                required
+              />
+              <span
+                class="form-error"
+                id="dateOfBirth-error"
+                aria-live="polite"
+              ></span>
+            </div>
+
+            <!-- Gender -->
+            <div class="form-group">
+              <label class="form-label" for="gender">Gender</label>
+              <select class="form-select" id="gender" name="gender">
+                <option value="">Prefer not to say</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Prefer not to say">Prefer not to say</option>
+              </select>
+              <span
+                class="form-error"
+                id="gender-error"
+                aria-live="polite"
+              ></span>
+            </div>
+          </div>
+        </fieldset>
+
+        <hr class="divider" />
+
+        <!-- ── Section 2: Academic Information ───────────── -->
+        <fieldset style="border: none; padding: 0; margin: 0 0 0.5rem">
+          <legend class="section-title" style="margin-bottom: 0.75rem">
+            Academic Information
+          </legend>
+          <div class="form-grid">
+            <!-- Matric Number -->
+            <div class="form-group">
+              <label class="form-label" for="matricNumber"
+                >Matric / Student ID
+                <span class="required" aria-hidden="true">*</span></label
+              >
+              <input
+                class="form-input"
+                type="text"
+                id="matricNumber"
+                name="matricNumber"
+                placeholder="e.g. CSC/2021/001"
+                required
+              />
+              <span
+                class="form-error"
+                id="matricNumber-error"
+                aria-live="polite"
+              ></span>
+            </div>
+
+            <!-- Department -->
+            <div class="form-group">
+              <label class="form-label" for="department"
+                >Department / Course
+                <span class="required" aria-hidden="true">*</span></label
+              >
+              <input
+                class="form-input"
+                type="text"
+                id="department"
+                name="department"
+                placeholder="e.g. Computer Science"
+                required
+              />
+              <span
+                class="form-error"
+                id="department-error"
+                aria-live="polite"
+              ></span>
+            </div>
+
+            <!-- Level -->
+            <div class="form-group">
+              <label class="form-label" for="level"
+                >Level / Year of Study
+                <span class="required" aria-hidden="true">*</span></label
+              >
+              <select class="form-select" id="level" name="level" required>
+                <option value="">Select level</option>
+                <option value="100L">100 Level</option>
+                <option value="200L">200 Level</option>
+                <option value="300L">300 Level</option>
+                <option value="400L">400 Level</option>
+                <option value="500L">500 Level</option>
+                <option value="600L">600 Level</option>
+              </select>
+              <span
+                class="form-error"
+                id="level-error"
+                aria-live="polite"
+              ></span>
+            </div>
+          </div>
+        </fieldset>
+
+        <hr class="divider" />
+
+        <!-- ── Section 3: Password ────────────────────────── -->
+        <fieldset style="border: none; padding: 0; margin: 0 0 1.25rem">
+          <legend class="section-title" style="margin-bottom: 0.75rem">
+            Set Password
+          </legend>
+          <div class="form-grid">
+            <!-- Password -->
+            <div class="form-group">
+              <label class="form-label" for="password"
+                >Password
+                <span class="required" aria-hidden="true">*</span></label
+              >
+              <div class="input-wrapper">
+                <input
+                  class="form-input"
+                  type="password"
+                  id="password"
+                  name="password"
+                  placeholder="Min 8 chars, upper, lower, number"
+                  autocomplete="new-password"
+                  required
+                />
+                <button
+                  type="button"
+                  class="input-wrapper__toggle"
+                  aria-label="Show password"
+                >
+                  <svg
+                    class="icon-eye"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                  <svg
+                    class="icon-eye-off"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                    style="display: none"
+                  >
+                    <path
+                      d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"
+                    />
+                    <line x1="1" y1="1" x2="23" y2="23" />
+                  </svg>
+                </button>
+              </div>
+              <span
+                class="form-error"
+                id="password-error"
+                aria-live="polite"
+              ></span>
+            </div>
+
+            <!-- Confirm Password -->
+            <div class="form-group">
+              <label class="form-label" for="confirmPassword"
+                >Confirm Password
+                <span class="required" aria-hidden="true">*</span></label
+              >
+              <div class="input-wrapper">
+                <input
+                  class="form-input"
+                  type="password"
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  placeholder="Repeat your password"
+                  autocomplete="new-password"
+                  required
+                />
+                <button
+                  type="button"
+                  class="input-wrapper__toggle"
+                  aria-label="Show password"
+                >
+                  <svg
+                    class="icon-eye"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                  <svg
+                    class="icon-eye-off"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                    style="display: none"
+                  >
+                    <path
+                      d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"
+                    />
+                    <line x1="1" y1="1" x2="23" y2="23" />
+                  </svg>
+                </button>
+              </div>
+              <span
+                class="form-error"
+                id="confirmPassword-error"
+                aria-live="polite"
+              ></span>
+            </div>
+          </div>
+        </fieldset>
+
+        <button type="submit" class="btn btn--primary btn--full">
+          Create Account
+        </button>
+      </form>
+
+      <p class="auth-footer">
+        Already have an account? <a href="/index.html">Sign in</a>
+      </p>
+    </main>
+
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+  </body>
+</html>
