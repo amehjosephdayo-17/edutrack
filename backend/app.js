@@ -16,6 +16,9 @@ connectDB();
 
 const app = express();
 
+// Trust Vercel's reverse proxy so secure cookies work correctly
+app.set("trust proxy", 1);
+
 // Body parsing
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -29,7 +32,9 @@ app.use(
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: process.env.COOKIE_SECURE === "true",
+      secure:
+        process.env.NODE_ENV === "production" ||
+        process.env.COOKIE_SECURE === "true",
       sameSite: "lax",
       maxAge: parseInt(process.env.SESSION_MAX_AGE_MS) || 1800000,
     },
