@@ -1,12 +1,11 @@
 class OTPVerification {
   constructor() {
     this.email = "";
-    this.otpType = "registration"; // 'registration' or 'reset'
+    this.otpType = "registration";
     this.timerInterval = null;
-    this.timeRemaining = 600; // 10 minutes in seconds
-    this.resendCooldown = 0;
-    this.maxAttempts = 5;
+    this.timeRemaining = 600;
     this.attempts = 0;
+    this.maxAttempts = 5;
 
     this.init();
   }
@@ -15,7 +14,7 @@ class OTPVerification {
     this.getQueryParams();
     this.setupEventListeners();
     this.startTimer();
-    this.displayEmail();
+    this.updateHeaderText();
     this.focusFirstInput();
   }
 
@@ -35,14 +34,13 @@ class OTPVerification {
     }
   }
 
-  displayEmail() {
-    const emailDisplay = document.getElementById("displayEmail");
-    if (emailDisplay && this.email) {
-      // Mask email: am***.com
+  updateHeaderText() {
+    const headerText = document.getElementById("headerText");
+    if (headerText && this.email) {
       const [username, domain] = this.email.split("@");
       const maskedUsername = username.charAt(0) + username.charAt(1) + "***";
       const maskedEmail = `${maskedUsername}@${domain}`;
-      emailDisplay.textContent = maskedEmail;
+      headerText.textContent = `Please enter the verification code sent to ${maskedEmail}`;
     }
   }
 
@@ -52,7 +50,6 @@ class OTPVerification {
     const resendBtn = document.getElementById("resendBtn");
     const backLink = document.getElementById("backLink");
 
-    // OTP input navigation
     inputs.forEach((input, index) => {
       input.addEventListener("input", (e) =>
         this.handleOTPInput(e, index, inputs),
@@ -73,7 +70,6 @@ class OTPVerification {
           : "forgot-password.html";
     });
 
-    // Set back link href
     backLink.href =
       this.otpType === "registration"
         ? "register.html"
@@ -83,18 +79,17 @@ class OTPVerification {
   handleOTPInput(e, index, inputs) {
     const value = e.target.value;
 
-    // Only allow numeric input
     if (!/^\d*$/.test(value)) {
       e.target.value = "";
       return;
     }
 
-    // Move to next input if digit is entered
+    e.target.classList.toggle("filled", value.length > 0);
+
     if (value.length === 1 && index < inputs.length - 1) {
       inputs[index + 1].focus();
     }
 
-    // Enable/disable verify button based on all fields filled
     this.updateVerifyButtonState(inputs);
   }
 
@@ -120,6 +115,7 @@ class OTPVerification {
     if (digits.length > 0) {
       inputs.forEach((input, index) => {
         input.value = digits[index] || "";
+        input.classList.toggle("filled", input.value.length > 0);
       });
       this.updateVerifyButtonState(inputs);
     }
@@ -188,7 +184,6 @@ class OTPVerification {
           if (this.otpType === "registration") {
             window.location.href = "index.html";
           } else {
-            // Redirect to password reset page with token and email
             window.location.href = `reset-password.html?email=${encodeURIComponent(
               this.email,
             )}&token=${encodeURIComponent(data.resetToken)}`;
@@ -210,36 +205,16 @@ class OTPVerification {
   }
 
   async resendOTP() {
-    if (this.resendCooldown > 0) {
-      return;
-    }
-
     const resendBtn = document.getElementById("resendBtn");
     resendBtn.disabled = true;
     resendBtn.textContent = "Sending...";
 
-    try {
-      const endpoint =
-        this.otpType === "registration"
-          ? "/auth/register/request-otp"
-          : "/auth/forgot-password/request-otp";
-
-      // For resend, we need the original data
-      // For now, we'll show a message to re-register/reset request
-      if (this.otpType === "registration") {
-        this.showError("Please go back to registration and submit again.");
-        resendBtn.disabled = false;
-        resendBtn.textContent = "Resend Code";
-        return;
-      } else {
-        this.showError("Please go back to forgot password and request again.");
-        resendBtn.disabled = false;
-        resendBtn.textContent = "Resend Code";
-        return;
-      }
-    } catch (error) {
-      console.error("Resend OTP error:", error);
-      this.showError("Failed to resend OTP. Please try again.");
+    if (this.otpType === "registration") {
+      this.showError("Please go back to registration and submit again.");
+      resendBtn.disabled = false;
+      resendBtn.textContent = "Resend Code";
+    } else {
+      this.showError("Please go back to forgot password and request again.");
       resendBtn.disabled = false;
       resendBtn.textContent = "Resend Code";
     }
@@ -249,7 +224,7 @@ class OTPVerification {
     const inputs = document.querySelectorAll(".otp-input");
     inputs.forEach((input) => {
       input.value = "";
-      input.classList.remove("error");
+      input.classList.remove("filled");
     });
     this.focusFirstInput();
   }
@@ -265,27 +240,19 @@ class OTPVerification {
       const seconds = this.timeRemaining % 60;
       timerValue.textContent = `${minutes}:${seconds.toString().padStart(2, "0")}`;
 
-      // Update timer styling when < 2 minutes
       const timerContainer = document.querySelector(".otp-timer");
       if (this.timeRemaining < 120) {
         timerContainer.classList.add("warning");
       }
 
-      // Timer expired
       if (this.timeRemaining <= 0) {
         clearInterval(this.timerInterval);
-        timerContainer.textContent = "Code expired";
-        timerContainer.classList.remove("warning");
+        timerValue.textContent = "00:00";
         document.getElementById("verifyBtn").disabled = true;
         resendBtn.disabled = false;
         this.showError(
           "OTP has expired. Click 'Resend Code' to get a new one.",
         );
-      }
-
-      // Resend cooldown (allow resend after 30 seconds or when timer < 2 mins)
-      if (this.timeRemaining === 30 || this.timeRemaining === 60) {
-        resendBtn.disabled = false;
       }
     }, 1000);
   }
@@ -307,7 +274,6 @@ class OTPVerification {
   }
 }
 
-// Initialize OTP verification when DOM is ready
 document.addEventListener("DOMContentLoaded", () => {
   new OTPVerification();
 });
