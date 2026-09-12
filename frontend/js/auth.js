@@ -106,7 +106,8 @@ document.addEventListener("DOMContentLoaded", () => {
           setFieldError(field, msg),
         );
       } else {
-        setAlert(alertEl, data?.message || "Login failed. Please try again.");
+        const msg = data?.message || "Login failed. Please try again.";
+        setAlert(alertEl, msg);
       }
     });
   }
