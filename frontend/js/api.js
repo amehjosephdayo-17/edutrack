@@ -25,16 +25,17 @@ const API = (() => {
     try {
       const res = await fetch(url, config);
 
-      // Session expired / not authenticated — redirect to login
-      if (res.status === 401) {
-        window.location.href = "/index.html";
-        return { ok: false, status: 401, data: null };
-      }
-
       let data = null;
       const contentType = res.headers.get("content-type") || "";
       if (contentType.includes("application/json")) {
         data = await res.json();
+      }
+
+      // Session expired / not authenticated — redirect to login
+      // But NOT if it's a validation error (e.g. wrong current password with errors object)
+      if (res.status === 401 && (!data || !data.errors)) {
+        window.location.href = "/index.html";
+        return { ok: false, status: 401, data: null };
       }
 
       return { ok: res.ok, status: res.status, data };
