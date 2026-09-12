@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Verify OTP - EduTrack</title>
+    <link rel="stylesheet" href="css/variables.css" />
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <style>
+      body {
+        background: linear-gradient(
+          135deg,
+          rgba(107, 33, 168, 0.1),
+          rgba(214, 36, 159, 0.1)
+        );
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 1rem;
+      }
+
+      .otp-modal {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        max-width: 420px;
+        width: 100%;
+        padding: 3rem 2rem;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .otp-modal::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #6b21a8, #d6249f);
+      }
+
+      .otp-header {
+        text-align: center;
+        margin-bottom: 2.5rem;
+      }
+
+      .otp-icon {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .otp-header h1 {
+        font-size: 1.75rem;
+        color: #6b21a8;
+        margin: 0.5rem 0 0.25rem;
+        font-weight: 600;
+      }
+
+      .otp-header p {
+        color: #6b7280;
+        font-size: 0.95rem;
+        margin: 0;
+      }
+
+      .email-display {
+        background: linear-gradient(
+          135deg,
+          rgba(107, 33, 168, 0.05),
+          rgba(214, 36, 159, 0.05)
+        );
+        border: 1px solid rgba(107, 33, 168, 0.1);
+        padding: 1rem;
+        border-radius: 10px;
+        text-align: center;
+        margin-bottom: 1.5rem;
+      }
+
+      .email-display-label {
+        color: #6b7280;
+        font-size: 0.85rem;
+        margin-bottom: 0.25rem;
+      }
+
+      .email-display strong {
+        color: #6b21a8;
+        font-size: 1rem;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+      }
+
+      .error-message {
+        background-color: rgba(220, 53, 69, 0.1);
+        color: #dc3545;
+        padding: 0.85rem 1rem;
+        border-radius: 8px;
+        border-left: 3px solid #dc3545;
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+        display: none;
+      }
+
+      .error-message.show {
+        display: block;
+        animation: slideIn 0.3s ease;
+      }
+
+      .success-message {
+        background-color: rgba(40, 167, 69, 0.1);
+        color: #28a745;
+        padding: 0.85rem 1rem;
+        border-radius: 8px;
+        border-left: 3px solid #28a745;
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+        display: none;
+      }
+
+      .success-message.show {
+        display: block;
+        animation: slideIn 0.3s ease;
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .otp-input-group {
+        display: flex;
+        gap: 0.6rem;
+        justify-content: center;
+        margin: 2rem 0;
+        flex-wrap: wrap;
+      }
+
+      .otp-input {
+        width: 54px;
+        height: 54px;
+        font-size: 1.5rem;
+        text-align: center;
+        border: 2px solid #e5e7eb;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        background: #f9fafb;
+      }
+
+      .otp-input:focus {
+        outline: none;
+        border-color: #6b21a8;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(107, 33, 168, 0.1);
+      }
+
+      .otp-input.filled {
+        border-color: #d6249f;
+        background: linear-gradient(
+          135deg,
+          rgba(107, 33, 168, 0.05),
+          rgba(214, 36, 159, 0.05)
+        );
+      }
+
+      .otp-timer {
+        text-align: center;
+        margin: 1.5rem 0;
+        font-size: 0.95rem;
+        color: #6b7280;
+        font-weight: 500;
+      }
+
+      .otp-timer-value {
+        font-size: 1.25rem;
+        color: #6b21a8;
+        font-weight: 700;
+        font-family: "Monaco", "Courier New", monospace;
+      }
+
+      .otp-timer.warning .otp-timer-value {
+        color: #ff9800;
+        animation: pulse 1s infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.6;
+        }
+      }
+
+      .otp-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 0.85rem;
+        margin-top: 2rem;
+      }
+
+      .btn-verify {
+        background: linear-gradient(135deg, #6b21a8, #d6249f);
+        color: white;
+        padding: 0.9rem 1.5rem;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: 100%;
+        box-shadow: 0 4px 15px rgba(107, 33, 168, 0.3);
+      }
+
+      .btn-verify:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(107, 33, 168, 0.4);
+      }
+
+      .btn-verify:active:not(:disabled) {
+        transform: translateY(0);
+      }
+
+      .btn-verify:disabled {
+        background: #e5e7eb;
+        color: #9ca3af;
+        cursor: not-allowed;
+        box-shadow: none;
+      }
+
+      .btn-resend {
+        background: transparent;
+        color: #6b21a8;
+        padding: 0.9rem 1.5rem;
+        border: 2px solid #6b21a8;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: 100%;
+      }
+
+      .btn-resend:hover:not(:disabled) {
+        background: #6b21a8;
+        color: white;
+        transform: translateY(-2px);
+      }
+
+      .btn-resend:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        border-color: #d1d5db;
+        color: #9ca3af;
+      }
+
+      .otp-footer {
+        text-align: center;
+        margin-top: 1.5rem;
+        font-size: 0.9rem;
+      }
+
+      .otp-footer-text {
+        color: #6b7280;
+      }
+
+      .otp-footer a {
+        color: #6b21a8;
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.3s ease;
+      }
+
+      .otp-footer a:hover {
+        color: #d6249f;
+        text-decoration: underline;
+      }
+
+      @media (max-width: 480px) {
+        .otp-modal {
+          padding: 2rem 1.5rem;
+        }
+
+        .otp-header h1 {
+          font-size: 1.5rem;
+        }
+
+        .otp-input {
+          width: 48px;
+          height: 48px;
+          font-size: 1.25rem;
+        }
+
+        .otp-input-group {
+          gap: 0.45rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="otp-modal">
+      <div class="otp-header">
+        <div class="otp-icon">📱</div>
+        <h1>Enter OTP</h1>
+        <p>Please enter the verification code sent to your email.</p>
+      </div>
+
+      <div class="email-display">
+        <div class="email-display-label">Code sent to</div>
+        <strong id="displayEmail"></strong>
+      </div>
+
+      <div class="error-message" id="errorMessage"></div>
+      <div class="success-message" id="successMessage"></div>
+
+      <div class="otp-input-group" id="otpInputGroup">
+        <input
+          type="text"
+          class="otp-input"
+          maxlength="1"
+          inputmode="numeric"
+        />
+        <input
+          type="text"
+          class="otp-input"
+          maxlength="1"
+          inputmode="numeric"
+        />
+        <input
+          type="text"
+          class="otp-input"
+          maxlength="1"
+          inputmode="numeric"
+        />
+        <input
+          type="text"
+          class="otp-input"
+          maxlength="1"
+          inputmode="numeric"
+        />
+        <input
+          type="text"
+          class="otp-input"
+          maxlength="1"
+          inputmode="numeric"
+        />
+        <input
+          type="text"
+          class="otp-input"
+          maxlength="1"
+          inputmode="numeric"
+        />
+      </div>
+
+      <div class="otp-timer">
+        Time remaining:
+        <span class="otp-timer-value" id="timerValue">10:00</span>
+      </div>
+
+      <div class="otp-actions">
+        <button class="btn-verify" id="verifyBtn">Verify OTP</button>
+        <button class="btn-resend" id="resendBtn" disabled>Resend Code</button>
+      </div>
+
+      <div class="otp-footer">
+        <span class="otp-footer-text">Didn't receive the code? </span>
+        <a href="#" id="backLink">Go back</a>
+      </div>
+    </div>
+
+    <script src="js/verify-otp.js"></script>
+  </body>
+</html>

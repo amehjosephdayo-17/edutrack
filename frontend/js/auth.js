@@ -232,20 +232,19 @@ document.addEventListener("DOMContentLoaded", () => {
       submitBtn.classList.add("btn--loading");
       submitBtn.disabled = true;
 
-      const { ok, data } = await API.post("/auth/register", payload);
+      // Step 1: Send OTP request with registration data
+      const { ok, data } = await API.post(
+        "/auth/register/request-otp",
+        payload,
+      );
 
       submitBtn.classList.remove("btn--loading");
       submitBtn.disabled = false;
 
       if (ok && data?.success) {
-        setAlert(
-          alertEl,
-          "Registration successful! Redirecting to login…",
-          "success",
-        );
-        setTimeout(() => {
-          window.location.href = "/index.html";
-        }, 1500);
+        // Redirect to OTP verification page
+        const email = encodeURIComponent(data.email);
+        window.location.href = `/verify-otp.html?email=${email}&type=registration`;
         return;
       }
 
@@ -259,7 +258,7 @@ document.addEventListener("DOMContentLoaded", () => {
       } else {
         setAlert(
           alertEl,
-          data?.message || "Registration failed. Please try again.",
+          data?.message || "Failed to send OTP. Please try again.",
         );
       }
     });

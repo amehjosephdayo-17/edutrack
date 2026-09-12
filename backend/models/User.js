@@ -3,7 +3,6 @@ const mongoose = require("mongoose");
 const userSchema = new mongoose.Schema({
   fullName: {
     type: String,
-    required: true,
     trim: true,
   },
   email: {
@@ -15,28 +14,25 @@ const userSchema = new mongoose.Schema({
   },
   phone: {
     type: String,
-    required: true,
     trim: true,
   },
   matricNumber: {
     type: String,
-    required: true,
+    sparse: true,
     unique: true,
     trim: true,
   },
   department: {
     type: String,
-    required: true,
     trim: true,
   },
   level: {
     type: String,
-    required: true,
-    enum: ["ND 1", "ND 2", "HND 1", "HND 2"],
+    enum: ["ND 1", "ND 2", "HND 1", "HND 2", ""],
+    default: "",
   },
   dateOfBirth: {
     type: Date,
-    required: true,
   },
   gender: {
     type: String,
@@ -45,7 +41,28 @@ const userSchema = new mongoose.Schema({
   },
   passwordHash: {
     type: String,
-    required: true,
+  },
+  isEmailVerified: {
+    type: Boolean,
+    default: false,
+  },
+  registrationOTP: {
+    code: String,
+    expiresAt: Date,
+  },
+  resetOTP: {
+    code: String,
+    expiresAt: Date,
+  },
+  tempRegistrationData: {
+    fullName: String,
+    phone: String,
+    matricNumber: String,
+    department: String,
+    level: String,
+    dateOfBirth: Date,
+    gender: String,
+    passwordHash: String,
   },
   lastLogin: {
     type: Date,

@@ -3,17 +3,21 @@ const bcrypt = require("bcryptjs");
 const User = require("../models/User");
 const { loginLimiter, registerLimiter } = require("../middleware/rateLimiter");
 const {
-  registerValidation,
   loginValidation,
   handleValidationErrors,
 } = require("../middleware/validate");
+const {
+  registrationOTPRequestValidation,
+  otpValidation,
+  handleOTPValidationErrors,
+} = require("../middleware/otpValidation");
+const otpService = require("../services/otpService");
 
 const router = express.Router();
 
 // Generated once at startup — timing-safe dummy for login when email not found
 const DUMMY_HASH = bcrypt.hashSync("timing-safe-dummy-password", 12);
 
-// /auth/me 
 router.get("/me", (req, res) => {
   if (req.session && req.session.userId) {
     return res.json({ loggedIn: true });
@@ -21,13 +25,11 @@ router.get("/me", (req, res) => {
   return res.json({ loggedIn: false });
 });
 
-
-// auth/register
 router.post(
-  "/register",
+  "/register/request-otp",
   registerLimiter,
-  registerValidation,
-  handleValidationErrors,
+  registrationOTPRequestValidation,
+  handleOTPValidationErrors,
   async (req, res) => {
     try {
       const {
@@ -42,16 +44,20 @@ router.post(
         password,
       } = req.body;
 
-      // Check for existing email or matric number
-      const existingEmail = await User.findOne({ email: email.toLowerCase() });
-      if (existingEmail) {
+      const emailLower = email.toLowerCase();
+
+      const existingEmail = await User.findOne({ email: emailLower });
+      if (existingEmail && existingEmail.isEmailVerified) {
         return res.status(409).json({
           success: false,
           errors: { email: "This email address is already registered." },
         });
       }
 
-      const existingMatric = await User.findOne({ matricNumber });
+      const existingMatric = await User.findOne({
+        matricNumber,
+        isEmailVerified: true,
+      });
       if (existingMatric) {
         return res.status(409).json({
           success: false,
@@ -61,12 +67,27 @@ router.post(
         });
       }
 
-      const saltRounds = 12;
-      const passwordHash = await bcrypt.hash(password, saltRounds);
+      const passwordHash = await bcrypt.hash(password, 12);
 
-      const user = new User({
+      // Generate OTP
+      const otp = otpService.generateOTP();
+      const otpExpiry = otpService.getOTPExpiry();
+
+      let user = existingEmail;
+      if (!user) {
+        user = new User({
+          email: emailLower,
+          isEmailVerified: false,
+        });
+      }
+
+      // Store OTP and temporary registration data
+      user.registrationOTP = {
+        code: otp,
+        expiresAt: otpExpiry,
+      };
+      user.tempRegistrationData = {
         fullName,
-        email: email.toLowerCase(),
         phone,
         matricNumber,
         department,
@@ -74,16 +95,29 @@ router.post(
         dateOfBirth: new Date(dateOfBirth),
         gender: gender || "",
         passwordHash,
-      });
+      };
 
       await user.save();
 
-      return res.status(201).json({
+      // Send OTP via email
+      try {
+        await otpService.sendOTPEmail(emailLower, otp, "registration");
+      } catch (emailError) {
+        console.error("Failed to send OTP email:", emailError);
+        return res.status(500).json({
+          success: false,
+          message: "Failed to send OTP email. Please try again later.",
+        });
+      }
+
+      return res.status(200).json({
         success: true,
-        message: "Registration successful. You can now log in.",
+        message:
+          "OTP sent to your email. Please verify to complete registration.",
+        email: emailLower,
       });
     } catch (err) {
-      console.error("Register error:", err);
+      console.error("Register OTP request error:", err);
       return res
         .status(500)
         .json({ success: false, message: "Server error. Please try again." });
@@ -91,7 +125,73 @@ router.post(
   },
 );
 
-// /auth/login
+router.post(
+  "/register/verify-otp",
+  registerLimiter,
+  otpValidation,
+  handleOTPValidationErrors,
+  async (req, res) => {
+    try {
+      const { email, otp } = req.body;
+      const emailLower = email.toLowerCase();
+
+      if (!emailLower) {
+        return res.status(400).json({
+          success: false,
+          message: "Email is required.",
+        });
+      }
+
+      const user = await User.findOne({ email: emailLower });
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message:
+            "User not found. Please complete registration request first.",
+        });
+      }
+
+      // Verify OTP
+      const otpVerification = otpService.verifyOTP(otp, user.registrationOTP);
+      if (!otpVerification.valid) {
+        return res.status(400).json({
+          success: false,
+          message: otpVerification.message,
+        });
+      }
+
+      // Apply temporary registration data to user
+      if (user.tempRegistrationData) {
+        user.fullName = user.tempRegistrationData.fullName;
+        user.phone = user.tempRegistrationData.phone;
+        user.matricNumber = user.tempRegistrationData.matricNumber;
+        user.department = user.tempRegistrationData.department;
+        user.level = user.tempRegistrationData.level;
+        user.dateOfBirth = user.tempRegistrationData.dateOfBirth;
+        user.gender = user.tempRegistrationData.gender;
+        user.passwordHash = user.tempRegistrationData.passwordHash;
+      }
+
+      // Clear OTP and temporary data
+      user.registrationOTP = otpService.clearOTP(user.registrationOTP);
+      user.tempRegistrationData = undefined;
+      user.isEmailVerified = true;
+
+      await user.save();
+
+      return res.status(201).json({
+        success: true,
+        message: "Registration successful! You can now log in.",
+      });
+    } catch (err) {
+      console.error("Register OTP verification error:", err);
+      return res
+        .status(500)
+        .json({ success: false, message: "Server error. Please try again." });
+    }
+  },
+);
+
 router.post(
   "/login",
   loginLimiter,
@@ -106,10 +206,11 @@ router.post(
       const user = await User.findOne({ email: email.toLowerCase() });
 
       // Always run bcrypt compare to prevent timing attacks
-      const hashToCompare = user ? user.passwordHash : DUMMY_HASH;
+      const hashToCompare =
+        user && user.passwordHash ? user.passwordHash : DUMMY_HASH;
       const isMatch = await bcrypt.compare(password, hashToCompare);
 
-      if (!user || !isMatch) {
+      if (!user || !isMatch || !user.isEmailVerified) {
         return res.status(401).json({ success: false, message: genericError });
       }
 
@@ -142,7 +243,6 @@ router.post(
   },
 );
 
-// /auth/logout
 router.post("/logout", (req, res) => {
   req.session.destroy((err) => {
     if (err) {

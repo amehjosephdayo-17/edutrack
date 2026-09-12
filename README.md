@@ -1,18 +1,19 @@
 # EduTrack — Student Portal
 
-A full-stack student portal built with Node.js, Express, MongoDB, and plain HTML/CSS/JS. Students can register, log in, view their profile on a protected dashboard, update their details, change their password, and reset a forgotten password.
+A full-stack student portal with secure email-based OTP verification for registration and password reset. Students can register with email verification, log in, view their profile on a protected dashboard, update their details, change their password, and recover forgotten passwords securely.
 
 ---
 
 ## Tech Stack
 
-| Layer    | Tech                                                  |
-| -------- | ----------------------------------------------------- |
-| Frontend | HTML5, CSS3, Vanilla JS (ES6+)                        |
-| Backend  | Node.js, Express.js                                   |
-| Database | MongoDB via Mongoose                                  |
-| Auth     | `express-session` (session-based, httpOnly cookies)   |
-| Security | `bcryptjs`, `express-rate-limit`, `express-validator` |
+| Layer    | Technology                                                          |
+| -------- | ------------------------------------------------------------------- |
+| Frontend | HTML5, CSS3, Vanilla JS (ES6+)                                      |
+| Backend  | Node.js, Express.js                                                 |
+| Database | MongoDB via Mongoose                                                |
+| Auth     | `express-session` (session-based, httpOnly cookies)                 |
+| Email    | `nodemailer` (OTP delivery via Gmail or SMTP)                       |
+| Security | `bcryptjs`, `express-rate-limit`, `express-validator`, `nodemailer` |
 
 ---
 
@@ -21,40 +22,47 @@ A full-stack student portal built with Node.js, Express, MongoDB, and plain HTML
 ```
 edutrack/
 ├── backend/
-│   ├── app.js                         # Express entry point — middleware, routes, static serving
-│   ├── .env.example                   # Environment variable template (commit this, not .env)
+│   ├── app.js                         # Express entry point
+│   ├── .env.example                   # Environment template
 │   ├── config/
-│   │   └── db.js                      # MongoDB connection via Mongoose
+│   │   └── db.js                      # MongoDB connection
 │   ├── routes/
-│   │   ├── auth.routes.js             # GET /auth/me, POST /login, /register, /logout
-│   │   ├── dashboard.routes.js        # GET /dashboard (protected)
-│   │   ├── settings.routes.js         # GET|PATCH /settings/profile, POST /settings/password
-│   │   └── forgot-password.routes.js  # POST /auth/forgot-password/verify, /reset
+│   │   ├── auth.routes.js             # Authentication with OTP
+│   │   ├── dashboard.routes.js        # Student dashboard (protected)
+│   │   ├── settings.routes.js         # Profile & password (protected)
+│   │   └── forgot-password.routes.js  # Password reset with OTP
 │   ├── models/
-│   │   └── User.js                    # Mongoose user schema
+│   │   └── User.js                    # User schema with OTP fields
+│   ├── services/
+│   │   └── otpService.js              # OTP generation and email
 │   └── middleware/
-│       ├── auth.middleware.js         # Session guard — redirects unauthenticated requests
-│       ├── rateLimiter.js             # Rate-limit configs for login + register
-│       └── validate.js                # express-validator chains + error handler
+│       ├── auth.middleware.js         # Session guard
+│       ├── rateLimiter.js             # Rate limiting
+│       ├── validate.js                # Input validation
+│       └── otpValidation.js           # OTP validation
 │
 ├── frontend/
-│   ├── index.html                     # Login page
-│   ├── register.html                  # Registration page
-│   ├── dashboard.html                 # Student profile dashboard (protected)
-│   ├── settings.html                  # Profile update + password change (protected)
-│   ├── forgot-password.html           # Two-step forgot-password flow
+│   ├── index.html                     # Login
+│   ├── register.html                  # Registration
+│   ├── verify-otp.html                # OTP verification (reusable)
+│   ├── reset-password.html            # Password reset
+│   ├── dashboard.html                 # Student profile (protected)
+│   ├── settings.html                  # Settings (protected)
+│   ├── forgot-password.html           # Forgot password request
 │   ├── css/
-│   │   ├── variables.css              # Design tokens (colours, radii, fonts)
-│   │   ├── base.css                   # Reset, typography, auth page layout
-│   │   ├── layout.css                 # App shell, sidebar, topbar, responsive
-│   │   └── components.css             # Buttons, cards, forms, alerts, dropdowns
+│   │   ├── variables.css              # Design tokens
+│   │   ├── base.css                   # Typography, layout
+│   │   ├── layout.css                 # App shell, responsive
+│   │   └── components.css             # UI components
 │   ├── js/
-│   │   ├── api.js                     # fetch wrapper (GET/POST/PATCH + 401 redirect)
-│   │   ├── auth.js                    # Login + register logic, session-check redirect
-│   │   ├── dashboard.js               # Fetches and renders student profile
-│   │   ├── settings.js                # Profile update + password change logic
-│   │   ├── sidebar.js                 # Topbar toggle (desktop collapse + mobile drawer)
-│   │   └── forgot-password.js         # Two-step password reset flow
+│   │   ├── api.js                     # Fetch wrapper
+│   │   ├── auth.js                    # Login & register
+│   │   ├── verify-otp.js              # OTP input handling
+│   │   ├── reset-password.js          # Password reset form
+│   │   ├── dashboard.js               # Profile display
+│   │   ├── settings.js                # Settings logic
+│   │   ├── sidebar.js                 # Navigation
+│   │   └── forgot-password.js         # Forgot password flow
 │   └── assets/
 │       └── logo.svg
 │
@@ -65,171 +73,201 @@ edutrack/
 
 ## Prerequisites
 
-- [Node.js](https://nodejs.org/) v18 or later
-- [MongoDB](https://www.mongodb.com/) running locally, **or** a MongoDB Atlas connection string
+- Node.js v18+
+- MongoDB (local or Atlas)
+- Email account (Gmail with App Password or custom SMTP)
 
 ---
 
 ## Getting Started
 
-### 1. Clone the repo
+### 1. Clone & Install
 
 ```bash
 git clone https://github.com/ameh-samson/edutrack.git
-cd edutrack
-```
-
-### 2. Install backend dependencies
-
-```bash
-cd backend
+cd edutrack/backend
 npm install
 ```
 
-### 3. Configure environment variables
+### 2. Configure Environment
 
 ```bash
 cp .env.example .env
 ```
 
-Open `backend/.env` and fill in your values:
+Edit `backend/.env`:
 
 ```env
 PORT=5000
-MONGODB_URI=your_mongodb_connection_string_here
-SESSION_SECRET=replace_with_a_long_random_string
+MONGODB_URI=your_mongodb_connection_string
+SESSION_SECRET=generate_a_long_random_string
 NODE_ENV=development
 COOKIE_SECURE=false
 
-# Rate limiting
-LOGIN_RATE_LIMIT_WINDOW_MS=900000   # 15 minutes
-LOGIN_RATE_LIMIT_MAX=5              # attempts per window per IP
+# Email Configuration
+EMAIL_SERVICE=gmail
+EMAIL_USER=your-email@gmail.com
+EMAIL_PASSWORD=your-app-password
+EMAIL_FROM=noreply@edutrack.com
 
-# Session duration
-SESSION_MAX_AGE_MS=1800000          # 30 minutes (standard session)
-REMEMBER_ME_MAX_AGE_MS=86400000     # 24 hours (remember me)
+# Rate Limiting
+LOGIN_RATE_LIMIT_WINDOW_MS=900000
+LOGIN_RATE_LIMIT_MAX=5
+
+# Session Duration
+SESSION_MAX_AGE_MS=1800000
+REMEMBER_ME_MAX_AGE_MS=86400000
 ```
 
-> **Never commit your real `.env` file.** It is gitignored by default.
+**Gmail Setup:** Enable 2FA and create an [App Password](https://myaccount.google.com/apppasswords). Use the 16-char password as `EMAIL_PASSWORD`.
 
-### 4. Start the server
+**Custom SMTP:** Set `EMAIL_SERVICE=custom` and add:
+
+```env
+EMAIL_HOST=smtp.example.com
+EMAIL_PORT=587
+EMAIL_SECURE=false
+```
+
+### 3. Start Server
 
 ```bash
-npm run dev    # development — auto-restarts on file changes
+npm run dev    # development with auto-restart
 npm start      # production
 ```
 
-### 5. Open in browser
-
-```
-http://localhost:5000
-```
-
-The Express server serves the entire `frontend/` folder as static files — the full app runs from a single port.
-
----
-
-## Pages & Routes
-
-| Page            | URL                     | Backend Route                                                                 | Auth Required |
-| --------------- | ----------------------- | ----------------------------------------------------------------------------- | ------------- |
-| Login           | `/` or `/index.html`    | `POST /auth/login`, `GET /auth/me`                                            | No            |
-| Register        | `/register.html`        | `POST /auth/register`, `GET /auth/me`                                         | No            |
-| Dashboard       | `/dashboard.html`       | `GET /dashboard`                                                              | Yes           |
-| Settings        | `/settings.html`        | `GET /settings/profile`, `PATCH /settings/profile`, `POST /settings/password` | Yes           |
-| Forgot Password | `/forgot-password.html` | `POST /auth/forgot-password/verify`, `POST /auth/forgot-password/reset`       | No            |
-| Logout          | —                       | `POST /auth/logout`                                                           | Yes           |
-
-Unauthenticated requests to protected routes are redirected to `/index.html`. API callers receive `401 JSON`.
-Already-authenticated users visiting `/index.html` or `/register.html` are automatically redirected to `/dashboard.html`.
+Visit `http://localhost:5000`
 
 ---
 
 ## Features
 
-### Authentication
+### OTP-Based Email Verification
 
+**Registration Flow:**
+
+- User submits registration form → OTP sent to email (10-min expiry)
+- User verifies email via 6-digit OTP code
+- Account created only after successful verification
+- User can now log in
+
+**Password Reset Flow:**
+
+- User verifies identity (email + matric number) → OTP sent
+- User verifies OTP code
+- User sets new password
+- User can log in with new password
+
+**OTP Features:**
+
+- 6-digit numeric codes with 10-minute expiry
+- Professional HTML email templates
+- Auto-focus between digit input fields
+- Paste support (enter all 6 digits at once)
+- Visual countdown timer with expiry warning
+- Max 5 failed attempts before requesting new OTP
+- Rate-limited OTP requests (same as registration limits)
+
+### Authentication & Security
+
+- Email verification required before login
 - Session-based auth with httpOnly, `sameSite: lax` cookies
-- Passwords hashed with `bcryptjs` at 12 salt rounds
-- Timing-safe login — bcrypt compare always runs (dummy hash when user not found) to prevent email enumeration via response time
-- Generic error on login failure — no hint whether email or password was wrong
+- Passwords hashed with bcryptjs (12 salt rounds)
+- Timing-safe login (constant-time comparison prevents email enumeration)
+- Generic error messaging (no hint if email or password wrong)
+- Rate limiting: 5 login attempts per 15 minutes per IP
+- Rate limiting: 10 registration attempts per hour per IP
 
-### Already Logged In Redirect
+### User Experience
 
-- Visiting the login or register page with an active session immediately redirects to the dashboard
+- **Already Logged In:** Visiting login/register page redirects to dashboard
+- **Remember Me:** Unchecked = 30-min session; Checked = 24-hour session
+- **Responsive Design:** Desktop sidebar, mobile drawer navigation
+- **Skeleton Loaders:** Smooth loading states for profile data
+- **Inline Validation:** Both client-side (immediate) and server-side (authoritative)
 
-### Remember Me
+### Dashboard & Settings
 
-- Unchecked: session expires after 30 minutes of inactivity
-- Checked: session persists for 24 hours
-
-### Forgot Password
-
-- Step 1 — student provides email + matric number; server verifies both match the same account and returns a short-lived token (15-minute expiry)
-- Step 2 — student sets a new password using that token; token is invalidated immediately after use
-
-### Rate Limiting
-
-- Login: max 5 attempts per 15 minutes per IP → `429 Too Many Requests`
-- Register: max 10 attempts per hour per IP
-
-### Validation
-
-Both client-side (immediate feedback) and server-side (authoritative) on all forms:
-
-| Field            | Rules                                                 |
-| ---------------- | ----------------------------------------------------- |
-| Full Name        | Letters, spaces, hyphens · 2–60 chars                 |
-| Email            | Valid format · unique · normalized to lowercase       |
-| Phone            | 10–14 digits · optional leading `+`                   |
-| Matric Number    | Exactly 10 digits · unique (e.g. 2460113247)          |
-| Department       | Non-empty                                             |
-| Level            | One of: ND 1, ND 2, HND 1, HND 2                      |
-| Date of Birth    | Valid date · age 14–80                                |
-| Password         | ≥ 8 chars · at least one uppercase, lowercase, number |
-| Confirm Password | Must match Password                                   |
-
-### Dashboard
-
-Displays the authenticated student's full profile: name, email, phone, matric number, department, level, date of birth, gender, last login, and join date. Skeleton loader shown while fetching.
-
-### Settings
-
-- **Update profile** — edit all fields except matric number (read-only after registration)
-- **Change password** — requires current password; session is invalidated on success
-
-### UI / Navigation
-
-- Topbar toggle button: on desktop it collapses/expands the sidebar (chevron `>` rotates to `<` when open); on mobile it opens a full-height drawer
-- Sidebar collapse state persisted to `localStorage` — survives page navigation
-- Fully responsive — sidebar becomes a drawer at ≤ 768 px
-- Design tokens in `css/variables.css` — purple primary (`#6B21A8`), pink accent (`#D6249F`)
+- **Dashboard:** View complete profile (name, email, matric, department, level, DOB, gender, last login, join date)
+- **Settings:** Update profile (matric number read-only) and change password
+- **Session Invalidation:** Logging out on another device invalidates current session
 
 ---
 
-## Environment Variables Reference
+## API Endpoints
 
-| Variable                     | Default       | Description                             |
-| ---------------------------- | ------------- | --------------------------------------- |
-| `PORT`                       | `5000`        | Server listen port                      |
-| `MONGODB_URI`                | —             | MongoDB connection string               |
-| `SESSION_SECRET`             | —             | Long random string for session signing  |
-| `NODE_ENV`                   | `development` | Set to `production` in production       |
-| `COOKIE_SECURE`              | `false`       | Set to `true` when serving over HTTPS   |
-| `LOGIN_RATE_LIMIT_WINDOW_MS` | `900000`      | Login rate-limit window in ms (15 min)  |
-| `LOGIN_RATE_LIMIT_MAX`       | `5`           | Max login attempts per window per IP    |
-| `SESSION_MAX_AGE_MS`         | `1800000`     | Standard session duration (30 min)      |
-| `REMEMBER_ME_MAX_AGE_MS`     | `86400000`    | Remember-me session duration (24 hours) |
+### Authentication
+
+| Endpoint                            | Method | Purpose                       |
+| ----------------------------------- | ------ | ----------------------------- |
+| `/auth/me`                          | GET    | Check if logged in            |
+| `/auth/login`                       | POST   | Log in with credentials       |
+| `/auth/logout`                      | POST   | Log out (destroy session)     |
+| `/auth/register/request-otp`        | POST   | Submit registration, send OTP |
+| `/auth/register/verify-otp`         | POST   | Verify OTP, create account    |
+| `/auth/forgot-password/request-otp` | POST   | Verify identity, send OTP     |
+| `/auth/forgot-password/verify-otp`  | POST   | Verify OTP for reset          |
+| `/auth/forgot-password/reset`       | POST   | Set new password              |
+
+### Protected Routes
+
+| Endpoint             | Method | Purpose                          |
+| -------------------- | ------ | -------------------------------- |
+| `/dashboard`         | GET    | Get authenticated user's profile |
+| `/settings/profile`  | GET    | Get profile data                 |
+| `/settings/profile`  | PATCH  | Update profile                   |
+| `/settings/password` | POST   | Change password                  |
+
+---
+
+## Validation Rules
+
+| Field         | Rules                                                     |
+| ------------- | --------------------------------------------------------- |
+| Full Name     | 2–60 chars, letters/spaces/hyphens only                   |
+| Email         | Valid format, unique, normalized to lowercase             |
+| Phone         | 10–14 digits, optional leading `+`                        |
+| Matric Number | Exactly 10 digits, unique per verified account            |
+| Department    | Non-empty string                                          |
+| Level         | One of: ND 1, ND 2, HND 1, HND 2                          |
+| Date of Birth | Valid date, age 14–80                                     |
+| Password      | ≥8 chars, 1 uppercase, 1 lowercase, 1 number              |
+| OTP Code      | Exactly 6 digits, within 10-minute window, max 5 attempts |
 
 ---
 
 ## Security Notes
 
 - Session cookies are `httpOnly` and `sameSite: lax`
-- Set `COOKIE_SECURE=true` and serve over HTTPS in production
-- Generate a fresh `SESSION_SECRET` before any deployment
-- Keep `MONGODB_URI` (with credentials) in `.env` — never commit it
-- Rate limiting is active on login and register out of the box
+- Set `COOKIE_SECURE=true` when serving over HTTPS
+- Generate a fresh `SESSION_SECRET` for each deployment
+- Keep `.env` (especially `MONGODB_URI` and email credentials) out of version control
+- Rate limiting protects against brute-force attacks
+- OTP expiry and attempt limits prevent unauthorized account recovery
+- Email verification prevents spam registrations
+
+---
+
+## Environment Variables
+
+| Variable                     | Default       | Description                            |
+| ---------------------------- | ------------- | -------------------------------------- |
+| `PORT`                       | `5000`        | Server port                            |
+| `MONGODB_URI`                | —             | MongoDB connection string              |
+| `SESSION_SECRET`             | —             | Long random string for session signing |
+| `NODE_ENV`                   | `development` | Set to `production` in production      |
+| `COOKIE_SECURE`              | `false`       | Set to `true` for HTTPS                |
+| `EMAIL_SERVICE`              | `gmail`       | Email service: `gmail` or `custom`     |
+| `EMAIL_USER`                 | —             | Email account username                 |
+| `EMAIL_PASSWORD`             | —             | Email account password or app password |
+| `EMAIL_FROM`                 | `EMAIL_USER`  | Display email (optional)               |
+| `EMAIL_HOST`                 | —             | SMTP host (required if custom)         |
+| `EMAIL_PORT`                 | `587`         | SMTP port                              |
+| `EMAIL_SECURE`               | `false`       | Use TLS                                |
+| `LOGIN_RATE_LIMIT_WINDOW_MS` | `900000`      | 15 minutes                             |
+| `LOGIN_RATE_LIMIT_MAX`       | `5`           | Max attempts per window                |
+| `SESSION_MAX_AGE_MS`         | `1800000`     | 30 minutes (standard session)          |
+| `REMEMBER_ME_MAX_AGE_MS`     | `86400000`    | 24 hours (remember me)                 |
 
 ---
 

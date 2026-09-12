@@ -1,13 +1,13 @@
 /**
  * forgot-password.js
- * Two-step flow:
- *  Step 1 — verify email + matric number (POST /auth/forgot-password/verify)
- *  Step 2 — set new password            (POST /auth/forgot-password/reset)
+ * Three-step OTP flow:
+ *  Step 1 — verify email + matric number (POST /auth/forgot-password/request-otp)
+ *  Step 2 — verify OTP                    (POST /auth/forgot-password/verify-otp)
+ *  Step 3 — set new password              (POST /auth/forgot-password/reset)
  */
 
 document.addEventListener("DOMContentLoaded", () => {
   const stepRequest = document.getElementById("step-request");
-  const stepReset = document.getElementById("step-reset");
 
   /* ── Utilities ──────────────────────────────────────────────── */
   function setFieldError(id, msg) {
@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  /* ── Step 1: Verify identity ────────────────────────────────── */
+  /* ── Step 1: Request OTP by verifying identity ───────────────── */
   const requestForm = document.getElementById("request-form");
   const requestAlert = document.getElementById("request-alert");
 
@@ -76,7 +76,8 @@ document.addEventListener("DOMContentLoaded", () => {
       btn.classList.add("btn--loading");
       btn.disabled = true;
 
-      const { ok, data } = await API.post("/auth/forgot-password/verify", {
+      // Step 1: Request OTP
+      const { ok, data } = await API.post("/auth/forgot-password/request-otp", {
         email,
         matricNumber,
       });
@@ -85,10 +86,9 @@ document.addEventListener("DOMContentLoaded", () => {
       btn.disabled = false;
 
       if (ok && data?.success) {
-        // Store token temporarily in memory (not localStorage for security)
-        requestForm.dataset.token = data.token;
-        stepRequest.style.display = "none";
-        stepReset.style.display = "";
+        // Redirect to OTP verification page
+        const encodedEmail = encodeURIComponent(data.email);
+        window.location.href = `/verify-otp.html?email=${encodedEmail}&type=reset`;
         return;
       }
 
@@ -98,89 +98,6 @@ document.addEventListener("DOMContentLoaded", () => {
         setAlert(
           requestAlert,
           data?.message || "Verification failed. Please check your details.",
-        );
-      }
-    });
-
-  /* ── Step 2: Reset password ─────────────────────────────────── */
-  const resetForm = document.getElementById("reset-form");
-  const resetAlert = document.getElementById("reset-alert");
-
-  resetForm &&
-    resetForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      setAlert(resetAlert, "");
-      setFieldError("newPassword", "");
-      setFieldError("confirmPassword", "");
-
-      const newPassword = document.getElementById("newPassword")?.value || "";
-      const confirmPassword =
-        document.getElementById("confirmPassword")?.value || "";
-      const token = requestForm?.dataset.token || "";
-
-      let hasErr = false;
-      if (!newPassword) {
-        setFieldError("newPassword", "Password is required.");
-        hasErr = true;
-      } else if (newPassword.length < 8) {
-        setFieldError("newPassword", "Password must be at least 8 characters.");
-        hasErr = true;
-      } else if (!/[A-Z]/.test(newPassword)) {
-        setFieldError(
-          "newPassword",
-          "Must contain at least one uppercase letter.",
-        );
-        hasErr = true;
-      } else if (!/[a-z]/.test(newPassword)) {
-        setFieldError(
-          "newPassword",
-          "Must contain at least one lowercase letter.",
-        );
-        hasErr = true;
-      } else if (!/[0-9]/.test(newPassword)) {
-        setFieldError("newPassword", "Must contain at least one number.");
-        hasErr = true;
-      }
-      if (!confirmPassword) {
-        setFieldError("confirmPassword", "Please confirm your password.");
-        hasErr = true;
-      } else if (confirmPassword !== newPassword) {
-        setFieldError("confirmPassword", "Passwords do not match.");
-        hasErr = true;
-      }
-      if (hasErr) return;
-
-      const btn = resetForm.querySelector("[type=submit]");
-      btn.classList.add("btn--loading");
-      btn.disabled = true;
-
-      const { ok, data } = await API.post("/auth/forgot-password/reset", {
-        token,
-        password: newPassword,
-        confirmPassword,
-      });
-
-      btn.classList.remove("btn--loading");
-      btn.disabled = false;
-
-      if (ok && data?.success) {
-        setAlert(
-          resetAlert,
-          "Password reset successfully. Redirecting to login…",
-          "success",
-        );
-        setTimeout(() => {
-          window.location.href = "/index.html";
-        }, 2000);
-        return;
-      }
-
-      if (data?.errors) {
-        Object.entries(data.errors).forEach(([f, m]) => setFieldError(f, m));
-      } else {
-        setAlert(
-          resetAlert,
-          data?.message || "Reset failed. Please try again.",
         );
       }
     });
